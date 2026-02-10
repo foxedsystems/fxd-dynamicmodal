@@ -1,5 +1,8 @@
 ﻿node_modules/
-dist/
-/docs/dist/
-*.log
+dist/*.map
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 .DS_Store
+Thumbs.db
+*.tsbuildinfo
