@@ -1,10 +1,13 @@
 ﻿# fxd-dynamicmodal
 
+[![CI](https://github.com/foxedsystems/fxd-dynamicmodal/actions/workflows/ci.yml/badge.svg)](https://github.com/foxedsystems/fxd-dynamicmodal/actions/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A lightweight Bootstrap 5 modal manager for loading inline or remote content with a clean API and lifecycle events.
 
 ## Overview
 
-fxd-dynamicmodal provides a small, modular wrapper around Bootstrap 5 modals. It can load content from DOM elements or fetch remote HTML, handle loading states, and emit useful events for integration and customization. It avoids jQuery and keeps the surface area minimal.
+fxd-dynamicmodal provides a small, modular wrapper around Bootstrap 5 modals. It can load content from DOM elements or fetch remote HTML, handle loading states, and emit useful events for integration and customization.
 
 ## Basic Usage
 
@@ -38,8 +41,7 @@ fxd-dynamicmodal provides a small, modular wrapper around Bootstrap 5 modals. It
 - API: [docs/api.md](docs/api.md)
 - Options: [docs/options.md](docs/options.md)
 - Events: [docs/events.md](docs/events.md)
-- Demo: [docs/index.html](docs/index.html)
 
 ## Demo
 
-Open `docs/index.html` after building the dist files.
+Demo: [https://foxedsystems.github.io/fxd-dynamicmodal/](https://foxedsystems.github.io/fxd-dynamicmodal/)
