@@ -1,0 +1,86 @@
+Folder PATH listing for volume Daten
+Volume serial number is 408E-3DD4
+D:.
+|   .gitignore
+|   CHANGELOG.md
+|   LICENSE
+|   package-lock.json
+|   package.json
+|   README.md
+|   RELEASE.md
+|   rollup.config.js
+|   vitest.config.js
+|   
++---.github
+|   \---workflows
+|           ci.yml
+|           
++---dist
+|       fxd-select.auto.esm.js
+|       fxd-select.auto.esm.js.map
+|       fxd-select.auto.esm.min.js
+|       fxd-select.auto.esm.min.js.map
+|       fxd-select.auto.umd.js
+|       fxd-select.auto.umd.js.map
+|       fxd-select.auto.umd.min.js
+|       fxd-select.auto.umd.min.js.map
+|       fxd-select.css
+|       fxd-select.esm.js
+|       fxd-select.esm.js.map
+|       fxd-select.esm.min.js
+|       fxd-select.esm.min.js.map
+|       fxd-select.umd.js
+|       fxd-select.umd.js.map
+|       fxd-select.umd.min.js
+|       fxd-select.umd.min.js.map
+|       
++---docs
+|   |   api.md
+|   |   auto-init.md
+|   |   events.md
+|   |   index.html
+|   |   no-bootstrap.html
+|   |   options.md
+|   |   
+|   \---dist
+|           fxd-select.auto.esm.js
+|           fxd-select.auto.esm.js.map
+|           fxd-select.auto.esm.min.js
+|           fxd-select.auto.esm.min.js.map
+|           fxd-select.auto.umd.js
+|           fxd-select.auto.umd.js.map
+|           fxd-select.auto.umd.min.js
+|           fxd-select.auto.umd.min.js.map
+|           fxd-select.css
+|           fxd-select.esm.js
+|           fxd-select.esm.js.map
+|           fxd-select.esm.min.js
+|           fxd-select.esm.min.js.map
+|           fxd-select.umd.js
+|           fxd-select.umd.js.map
+|           fxd-select.umd.min.js
+|           fxd-select.umd.min.js.map
+|                   
++---scripts
+|       build-docs.mjs
+|       copy-css.mjs
+|       
++---src
+|   |   auto.js
+|   |   index.js
+|   |   
+|   +---core
+|   |       events.js
+|   |       filter.js
+|   |       FxdSelect.js
+|   |       model.js
+|   |       render.js
+|   |       utils.js
+|   |       
+|   \---styles
+|           fxd-select.css
+|           
+\---tests
+        fxd-select.test.js
+        setup.js
+        

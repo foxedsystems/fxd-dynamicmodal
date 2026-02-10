@@ -1,0 +1,25 @@
+{
+  "name": "fxd-dynamicmodal",
+  "version": "0.1.0",
+  "description": "Bootstrap 5 dynamic modal loader",
+  "type": "module",
+  "main": "dist/fxd-dynamicmodal.umd.js",
+  "module": "dist/fxd-dynamicmodal.esm.js",
+  "exports": {
+    ".": {
+      "import": "./dist/fxd-dynamicmodal.esm.js",
+      "require": "./dist/fxd-dynamicmodal.umd.js"
+    }
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "build:docs": "node scripts/build-docs.mjs",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "jsdom": "^28.0.0",
+    "rollup": "^4.9.0",
+    "vitest": "^4.0.18"
+  }
+}

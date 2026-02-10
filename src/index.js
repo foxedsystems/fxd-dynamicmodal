@@ -1,0 +1,1 @@
+﻿export { FxdDynamicModal } from './core/FxdDynamicModal.js';
