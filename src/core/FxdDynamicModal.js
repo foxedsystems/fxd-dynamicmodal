@@ -187,6 +187,210 @@ export class FxdDynamicModal {
     return null;
   }
 
+  showConfirm(confirmOptions = {}) {
+    const options = {
+      ...FxdDynamicModal.confirmDefaults,
+      ...confirmOptions,
+    };
+    const settings = {
+      ...this.options,
+      ...options,
+      showFooter: true,
+      footerHtml: null,
+    };
+
+    this._clearConfirmState();
+
+    applyModalSettings(
+      {
+        dialog: this.dialogEl,
+        title: this.titleEl,
+        footer: this.footerEl,
+        closeBtn: this.closeBtnEl,
+      },
+      settings
+    );
+
+    setContent(this.bodyEl, options.message || '', settings.sanitize);
+
+    this.footerEl.innerHTML = '';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = `btn ${options.cancelVariant}`;
+    cancelBtn.textContent = options.cancelText;
+    cancelBtn.setAttribute('data-bs-dismiss', 'modal');
+    cancelBtn.dataset.fxdRole = 'confirm-cancel';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.type = 'button';
+    confirmBtn.className = `btn ${options.confirmVariant}`;
+    confirmBtn.textContent = options.confirmText;
+    confirmBtn.dataset.fxdRole = 'confirm-submit';
+
+    this.footerEl.appendChild(cancelBtn);
+    this.footerEl.appendChild(confirmBtn);
+
+    let completed = false;
+    const onHidden = () => {
+      if (completed) return;
+      completed = true;
+      this._clearConfirmState();
+      options.onCancel?.({ modal: this });
+    };
+
+    const onConfirmClick = async (event) => {
+      event.preventDefault();
+      if (completed) return;
+
+      const originalText = confirmBtn.textContent;
+      confirmBtn.disabled = true;
+      cancelBtn.disabled = true;
+      confirmBtn.textContent = options.confirmLoadingText;
+
+      try {
+        if (options.confirmAction) {
+          await this._executeConfirmAction(options.confirmAction);
+        }
+        options.onConfirm?.({ modal: this });
+        completed = true;
+        this._clearConfirmState();
+        this.close();
+      } catch (error) {
+        options.onError?.(error, { modal: this });
+        confirmBtn.disabled = false;
+        cancelBtn.disabled = false;
+        confirmBtn.textContent = originalText;
+      }
+    };
+
+    confirmBtn.addEventListener('click', onConfirmClick);
+    this.modalEl.addEventListener('hidden.bs.modal', onHidden);
+
+    this._confirmCleanup = () => {
+      confirmBtn.removeEventListener('click', onConfirmClick);
+      this.modalEl.removeEventListener('hidden.bs.modal', onHidden);
+      this._confirmCleanup = null;
+    };
+
+    this._ensureInstance(settings);
+    this.modalInstance.show();
+
+    return this;
+  }
+
+  _clearConfirmState() {
+    this._confirmCleanup?.();
+  }
+
+  async _executeConfirmAction(confirmAction) {
+    const action = {
+      method: 'POST',
+      data: {},
+      async: true,
+      headers: {},
+      ...confirmAction,
+    };
+    const method = String(action.method || 'POST').toUpperCase();
+    const context = { modal: this, action };
+
+    if (!action.url) {
+      throw new Error('confirmAction.url is required.');
+    }
+
+    const beforeResult = action.onBeforeSend?.(context);
+    if (beforeResult === false) {
+      throw new Error('confirmAction cancelled by onBeforeSend.');
+    }
+
+    if (!action.async) {
+      this._submitConfirmForm(action.url, method, action.data);
+      return null;
+    }
+
+    const fetchFn = action.fetch || this.options.fetch || fetch;
+    const isGet = method === 'GET';
+    const headers = { ...action.headers };
+    let url = action.url;
+    let body;
+
+    if (isGet) {
+      url = buildUrl(url, action.data || {});
+    } else {
+      const search = new URLSearchParams();
+      Object.entries(action.data || {}).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        search.append(key, String(value));
+      });
+      body = search.toString();
+      if (!headers['Content-Type']) {
+        headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+      }
+    }
+
+    let response;
+    let responseData = null;
+
+    try {
+      response = await fetchFn(url, {
+        method,
+        headers,
+        body,
+      });
+
+      const text = await response.text();
+      try {
+        responseData = JSON.parse(text);
+      } catch {
+        responseData = text;
+      }
+
+      if (!response.ok) {
+        throw new Error(`confirmAction request failed with status ${response.status}.`);
+      }
+
+      action.onSuccess?.(responseData, response, context);
+      return responseData;
+    } catch (error) {
+      action.onError?.(error, response, context);
+      throw error;
+    } finally {
+      action.onComplete?.(context);
+    }
+  }
+
+  _submitConfirmForm(url, method, data = {}) {
+    const form = document.createElement('form');
+    form.method = method;
+    form.action = url;
+    form.style.display = 'none';
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (item === undefined || item === null) return;
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = String(item);
+          form.appendChild(input);
+        });
+        return;
+      }
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = String(value);
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
+  }
+
   close() {
     this.modalInstance?.hide();
   }
@@ -240,4 +444,21 @@ FxdDynamicModal.defaults = {
   onLoadEnd: null,
   onError: null,
   onDestroy: null,
+};
+
+FxdDynamicModal.confirmDefaults = {
+  title: 'Confirm Action',
+  message: '',
+  confirmText: 'Confirm',
+  cancelText: 'Cancel',
+  confirmVariant: 'btn-danger',
+  cancelVariant: 'btn-outline-secondary',
+  confirmLoadingText: 'Working...',
+  size: 'sm',
+  bgClose: false,
+  showCloseBtn: true,
+  onConfirm: null,
+  onCancel: null,
+  onError: null,
+  confirmAction: null,
 };

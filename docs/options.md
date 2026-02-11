@@ -32,6 +32,27 @@
 }
 ```
 
+## Confirm Defaults (`FxdDynamicModal.confirmDefaults`)
+
+```js
+{
+  title: 'Confirm Action',
+  message: '',
+  confirmText: 'Confirm',
+  cancelText: 'Cancel',
+  confirmVariant: 'btn-danger',
+  cancelVariant: 'btn-outline-secondary',
+  confirmLoadingText: 'Working...',
+  size: 'sm',
+  bgClose: false,
+  showCloseBtn: true,
+  onConfirm: null,
+  onCancel: null,
+  onError: null,
+  confirmAction: null,
+}
+```
+
 ## Core
 
 - `modalId`: ID for the modal root element.
@@ -70,3 +91,16 @@
 - `onLoadEnd`: Called after content loads.
 - `onError`: Called on fetch or render errors.
 - `onDestroy`: Called after destroy.
+
+## Confirm Action (`showConfirm`)
+
+- `confirmAction.method`: HTTP method. Default `POST`.
+- `confirmAction.url`: Request URL (required).
+- `confirmAction.data`: Plain object request payload.
+- `confirmAction.async`: If `true` (default), uses `fetch`; if `false`, submits a hidden form.
+- `confirmAction.headers`: Extra headers for async requests.
+- `confirmAction.fetch`: Request function override for async mode.
+- `confirmAction.onBeforeSend(context)`: Called before request; return `false` to cancel.
+- `confirmAction.onSuccess(data, response, context)`: Called for successful async response.
+- `confirmAction.onError(error, response, context)`: Called for async request failure.
+- `confirmAction.onComplete(context)`: Called after async request finishes.

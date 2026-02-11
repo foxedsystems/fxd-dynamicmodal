@@ -80,6 +80,7 @@
         <a href="#demo-inline-block">Inline</a>
         <a href="#demo-remote-block">Remote</a>
         <a href="#demo-options-block">Options</a>
+        <a href="#demo-confirm-block">Confirm</a>
       </nav>
     </section>
 
@@ -121,10 +122,30 @@ modal.open('/api/modal', { id: 12 }, { title: 'Remote' });</code></pre>
           <pre><code>// Options override
 modal.open('#inline-content', {}, { size: 'xl', bgClose: false });</code></pre>
         </div>
+
+        <div class="demo-block" id="demo-confirm-block">
+          <div class="demo-label">Confirmation</div>
+          <div class="demo-desc">Runs confirm/cancel handlers with optional async request.</div>
+          <button class="btn btn-danger" id="demo-confirm">Open Confirm Dialog</button>
+          <pre><code>// Confirmation modal
+modal.showConfirm({
+  title: 'Delete item?',
+  message: 'This action cannot be undone.',
+  confirmText: 'Delete',
+  confirmAction: {
+    method: 'POST',
+    url: '/api/delete',
+    data: { id: 12 },
+    async: true,
+    onSuccess: () => console.log('deleted'),
+  },
+});</code></pre>
+        </div>
       </div>
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
     import { FxdDynamicModal } from './dist/fxd-dynamicmodal.esm.js';
 
@@ -146,6 +167,30 @@ modal.open('#inline-content', {}, { size: 'xl', bgClose: false });</code></pre>
 
     document.querySelector('#demo-options').addEventListener('click', () => {
       modal.open('#inline-content', {}, { title: 'Static XL', size: 'xl', bgClose: false });
+    });
+
+    document.querySelector('#demo-confirm').addEventListener('click', () => {
+      modal.showConfirm({
+        title: 'Delete item?',
+        message: 'This action cannot be undone.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        confirmVariant: 'btn-danger',
+        bgClose: false,
+        confirmAction: {
+          method: 'POST',
+          url: '/api/delete',
+          data: { id: 12 },
+          async: true,
+          fetch: async () => ({
+            ok: true,
+            status: 200,
+            text: async () => '{"status":"ok"}',
+          }),
+          onSuccess: (data) => console.log('confirm success', data),
+        },
+        onCancel: () => console.log('confirm cancelled'),
+      });
     });
   </script>
 </body>

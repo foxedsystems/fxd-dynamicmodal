@@ -28,6 +28,35 @@ fxd-dynamicmodal provides a small, modular wrapper around Bootstrap 5 modals. It
 </script>
 ```
 
+## Confirmation Dialog
+
+```js
+const modal = new FxdDynamicModal();
+
+modal.showConfirm({
+  title: 'Delete item?',
+  message: 'This action cannot be undone.',
+  confirmText: 'Delete',
+  cancelText: 'Cancel',
+  confirmVariant: 'btn-danger',
+  size: 'sm',
+  bgClose: false,
+  confirmAction: {
+    method: 'POST',
+    url: '/items/delete',
+    data: { id: 1 },
+    async: true,
+    onBeforeSend: ({ action }) => console.log(action.url),
+    onSuccess: (data) => console.log('deleted', data),
+    onError: (error) => console.error(error),
+    onComplete: () => console.log('request done'),
+  },
+  onCancel: () => console.log('cancelled'),
+});
+```
+
+Set `confirmAction.async: false` to submit a hidden form instead of `fetch`, like a normal browser form post.
+
 ## Features
 
 - Bootstrap 5 modal wrapper with clean API
