@@ -288,6 +288,10 @@ class FxdDynamicModal {
 
   async open(source = null, params = {}, overrideOptions = {}) {
     const settings = { ...this.options, ...overrideOptions };
+    const selectorSource = typeof source === 'string' ? source.trim() : '';
+    const isSelectorSource = Boolean(selectorSource && selectorSource.startsWith('#'));
+    const isElementSource = isDomElement(source);
+    const isRemoteSource = typeof source === 'string' && !isSelectorSource;
 
     applyModalSettings(
       {
@@ -299,35 +303,43 @@ class FxdDynamicModal {
       settings
     );
 
-    if (settings.loadingHtml) {
+    if (isRemoteSource && settings.loadingHtml) {
       setContent(this.bodyEl, settings.loadingHtml, settings.sanitize);
     }
 
     this._ensureInstance(settings);
-    this.modalInstance.show();
+    if (!source) {
+      this.modalInstance.show();
+      return null;
+    }
 
-    if (!source) return null;
-
-    if (typeof source === 'string' && source.trim().startsWith('#')) {
-      const el = document.querySelector(source.trim());
+    if (isSelectorSource) {
+      const el = document.querySelector(selectorSource);
       if (!el) {
         this._handleError(new Error('Element not found'), source);
+        this.modalInstance.show();
         return null;
       }
       this._startLoading(source);
       setContent(this.bodyEl, el.innerHTML, settings.sanitize);
       this._endLoading(source);
+      this.modalInstance.show();
+      this.modalInstance.handleUpdate?.();
       return null;
     }
 
-    if (isDomElement(source)) {
+    if (isElementSource) {
       this._startLoading(source);
       setContent(this.bodyEl, source, settings.sanitize);
       this._endLoading(source);
+      this.modalInstance.show();
+      this.modalInstance.handleUpdate?.();
       return null;
     }
 
-    if (typeof source === 'string') {
+    this.modalInstance.show();
+
+    if (isRemoteSource) {
       const url = buildUrl(source, params);
       const requestId = ++this.state.requestId;
       if (this.abortController) this.abortController.abort();
@@ -341,6 +353,7 @@ class FxdDynamicModal {
         if (requestId !== this.state.requestId) return null;
 
         setContent(this.bodyEl, html, settings.sanitize);
+        this.modalInstance.handleUpdate?.();
         if (settings.initTooltips) {
           this._disposeTooltips();
           this._tooltips = initTooltips(this.bodyEl, settings.tooltipOptions || {}, this.bootstrap) || [];
